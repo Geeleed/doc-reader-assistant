@@ -3,8 +3,8 @@ import fitz
 import base64
 import asyncio
 import ollama
-from initConfig import embedder
-import schemas as sc
+from src.initConfig import embedder
+import src.schemas as sc
 
 def text_to_embedding(text):
     return embedder.encode(text).tolist()

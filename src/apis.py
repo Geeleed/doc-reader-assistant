@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse
-import functions as fn
-import schemas as sc
+import src.functions as fn
+import src.schemas as sc
 
 app = FastAPI()
 
