@@ -1,3 +1,6 @@
+# Doc Reader Assistant
+โปรเจ็กนี้ใช้ LLM (llama) ซึ่งเป็น AI ภาษารันใช้งานแบบ offline ใน laptop เพื่อใช้ตอบคำถามผ่านการแชท โดยสามารถแนบไฟล์ pdf ให้โมเดลอ่านได้ด้วย ใช้งานผ่าน UI หน้าเว็บ
+
 # How to use this project.
 
 this project require python, ollama
@@ -35,7 +38,7 @@ ollama run llama3.2
 ## 3. run and use the project
 ### 3.1 run server
 ```bash
-python run.py
+python main.py
 ```
 ### 3.2 use the app
 open UI in the browser link http://localhost:8000/
