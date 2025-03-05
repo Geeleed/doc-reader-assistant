@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FastAPI + Ollama JSON Streaming + PDF Upload</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+      }
+      button {
+        margin-top: 10px;
+        padding: 10px;
+        cursor: pointer;
+      }
+      #output {
+        white-space: pre-wrap;
+        margin-top: 20px;
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>FastAPI + Ollama Streaming (JSON) + PDF Upload</h2>
+    <textarea id="prompt" placeholder="Enter your prompt..."></textarea>
+    <br />
+    <input type="file" id="pdfFile" accept="application/pdf" />
+    <br />
+    <button onclick="sendPrompt()">Send</button>
+    <div id="output"></div>
+
+    <script>
+      async function sendPrompt() {
+        const prompt = document.getElementById("prompt").value;
+        const pdfFile = document.getElementById("pdfFile").files[0];
+        const outputDiv = document.getElementById("output");
+        outputDiv.innerHTML = ""; // เคลียร์ผลลัพธ์ก่อนเริ่มใหม่
+
+        let pdfBase64 = null;
+        if (pdfFile) {
+          const reader = new FileReader();
+          reader.readAsDataURL(pdfFile);
+          await new Promise((resolve) => {
+            reader.onload = () => {
+              pdfBase64 = reader.result.split(",")[1]; // ตัดส่วน "data:application/pdf;base64,"
+              resolve();
+            };
+          });
+        }
+
+        const endpoint = pdfBase64
+          ? "http://localhost:8000/chat_with_pdf"
+          : "http://localhost:8000/chat";
+        const requestBody = pdfBase64
+          ? {
+              prompt: prompt,
+              file: pdfBase64, // ถ้ามีไฟล์ PDF จะแปลงเป็น Base64 ส่งไป
+            }
+          : {
+              prompt: prompt,
+            };
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          outputDiv.innerHTML += decoder.decode(value, { stream: true }); // แสดงผลแบบ real-time
+        }
+      }
+    </script>
+  </body>
+</html>
